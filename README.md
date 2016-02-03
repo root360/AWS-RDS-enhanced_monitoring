@@ -3,10 +3,10 @@ Prototype to visualize logged metric data of AWS RDS Enhanced Monitoring
 
 ## Dependencies
 
-* [https://aws.amazon.com/cli/|aws-cli]
-* [https://www.gnu.org/software/bash/|bash]
-* [http://kmkeen.com/jshon/2011-02-15-13-46-51-602.html|jshon]
-* [http://www.gnu.org/software/sed/|sed]
+* [aws-cli](https://aws.amazon.com/cli/)
+* [bash](https://www.gnu.org/software/bash/)
+* [jshon](http://kmkeen.com/jshon/2011-02-15-13-46-51-602.html)
+* [sed](http://www.gnu.org/software/sed/)
 
 ## Usage
 
