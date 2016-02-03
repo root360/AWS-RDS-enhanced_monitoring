@@ -10,8 +10,7 @@ Prototype to visualize logged metric data of AWS RDS Enhanced Monitoring
 
 ## Usage
 
-1. define credentials and profile for aws cli
-```
+1. define credentials and profile for aws cli ```
 aws configure
 ```
 2. get log group from AWS CloudWatch Logs via AWS Console or cli:
