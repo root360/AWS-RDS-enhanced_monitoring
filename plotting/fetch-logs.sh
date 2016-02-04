@@ -25,6 +25,8 @@ function usage() {
 
 # define default profile for aws-cli
 profile="default"
+# define default log-group-name
+groupname="RDSOSMetrics"
 # define default start time
 start="0"
 # define default end time
@@ -48,9 +50,17 @@ while getopts ':hp:g:s:b:e:' opt; do
       ;;
     'b')
       start="${OPTARG}"
+      # set timestamp to json timestamp (UNIX*1000)
+      [[ ${#start} -eq 10 ]] && start="${start}000"
+      [[ ${#start} -eq 11 ]] && start="${start}00"
+      [[ ${#start} -eq 12 ]] && start="${start}0"
       ;;
     'e')
       end="${OPTARG}"
+      # set timestamp to json timestamp (UNIX*1000)
+      [[ ${#end} -eq 10 ]] && end="${end}000"
+      [[ ${#end} -eq 11 ]] && end="${end}00"
+      [[ ${#end} -eq 12 ]] && end="${end}0"
       ;;
     ':')
       echo "${TMPNAME}: -${OPTARG} requires an argument" >&2
@@ -116,8 +126,8 @@ echo ']' >> "${infile}"
 
 # initialize metric type
 function startType() {
-  local type="${1}"
-  local category="${2}"
+  local category="${1}"
+  local type="${2}"
   echo "generating ${category} -> ${type}"
   echo '"'"${type}"'": {
   "label": "'"${category} ${type}"'",
@@ -130,45 +140,22 @@ function endType() {
   echo ']}' >> "${outfile}"
 }
 
-# write metrics of type diskIO
-function writeDiskIO() {
-  local type="$1"
-  local number="${2:-0}"
-  startType "${type}" "diskIO"
-  jshon -F "${infile}" -a -e timestamp -u -p -e data -e diskIO -e "${number}" -e "${type}" -u | sed '/^[0-9][0-9]*$/ { s/$/,/;N;s/\n//; };s/^/[/g;s/$/],/g' | sort -n >> "${outfile}"
-  endType
-}
-
-# write metrics of type CPU
-function writeCPU() {
-  local type="$1"
-  startType "${type}" "cpu"
-  jshon -F "${infile}" -a -e timestamp -u -p -e data -e cpuUtilization -e "${type}" -u | sed '/^[0-9][0-9]*$/ { s/$/,/;N;s/\n//; };s/^/[/g;s/$/],/g' | sort -n >> "${outfile}"
-  endType
-}
-
-# write metrics of type load average
-function writeLoadAvg() {
-  local type="$1"
-  startType "${type}" "load"
-  jshon -F "${infile}" -a -e timestamp -u -p -e data -e loadAverageMinute -e "${type}" -u | sed '/^[0-9][0-9]*$/ { s/$/,/;N;s/\n//; };s/^/[/g;s/$/],/g' | sort -n >> "${outfile}"
-  endType
-}
-
-# write metrics of type memory
-function writeMemory() {
-  local type="$1"
-  startType "${type}" "memory"
-  jshon -F "${infile}" -a -e timestamp -u -p -e data -e memory -e "${type}" -u | sed '/^[0-9][0-9]*$/ { s/$/,/;N;s/\n//; };s/^/[/g;s/$/],/g' | sort -n >> "${outfile}"
-  endType
-}
-
-# write metrics of type network
-function writeNetwork() {
-  local type="$1"
-  local number="${2:-0}"
-  startType "${type}" "network"
-  jshon -F "${infile}" -a -e timestamp -u -p -e data -e network -e "${number}" -e "${type}" -u | sed '/^[0-9][0-9]*$/ { s/$/,/;N;s/\n//; };s/^/[/g;s/$/],/g' | sort -n >> "${outfile}"
+function writeData() {
+  local category="${1}"
+  local type="${2}"
+  local number=0
+  startType "${3:-${category}}" "${type}" 
+  if [[ $(jshon -F "${infile}" -a -e data -e "${category}") =~ ^\[ ]]; then
+    # find data of given category and type
+    local data="$(jshon -F "${infile}" -a -e timestamp -u -p -e data -e "${category}" -e "${number}" -e "${type}" -u)"
+  else
+    # find data of given category and type
+    local data="$(jshon -F "${infile}" -a -e timestamp -u -p -e data -e "${category}" -e "${type}" -u)"
+  fi
+  # remove unnecessary lines and create valid json
+  sed '/^[0-9][0-9]*$/ { s/$/,/;N;s/\n//; };s/^/[/g;s/$/],/g' <<<"${data}" | \
+  # sort data by included timestamp
+  sort -n >> "${outfile}"
   endType
 }
 
@@ -176,44 +163,33 @@ function writeNetwork() {
 echo '{' > "${outfile}"
 
 ### process log data
-writeDiskIO "await"
-echo ',' >> "${outfile}"
-writeDiskIO "util"
-echo ',' >> "${outfile}"
-writeDiskIO "tps"
-echo ',' >> "${outfile}"
-writeDiskIO "avgQueueLen"
-echo ',' >> "${outfile}"
-writeDiskIO "writeKbPS"
-echo ',' >> "${outfile}"
-writeDiskIO "readKbPS"
-echo ',' >> "${outfile}"
-writeDiskIO "readIOsPS"
-echo ',' >> "${outfile}"
-writeDiskIO "writeIOsPS"
-echo ',' >> "${outfile}"
-writeCPU "steal"
-echo ',' >> "${outfile}"
-writeCPU "wait"
-echo ',' >> "${outfile}"
-writeCPU "irq"
-echo ',' >> "${outfile}"
-writeCPU "system"
-echo ',' >> "${outfile}"
-writeLoadAvg "five"
-echo ',' >> "${outfile}"
-writeMemory "writeback"
-echo ',' >> "${outfile}"
-writeMemory "cached"
-echo ',' >> "${outfile}"
-writeMemory "dirty"
-echo ',' >> "${outfile}"
-writeMemory "buffers"
-echo ',' >> "${outfile}"
-writeNetwork "tx"
-echo ',' >> "${outfile}"
-writeNetwork "rx"
+# get several disk IO metric data
+for type in "avgQueueLen" "await" "readIOsPS" "readKbPS" "tps" "writeIOsPS" "writeKbPS" "util"; do
+  writeData "diskIO" "${type}"
+  echo ',' >> "${outfile}"
+done
 
+# get several CPU metric data
+for type in "wait" "irq" "system" "steal"; do
+  writeData "cpuUtilization" "${type}" "CPU"
+  echo ',' >> "${outfile}"
+done
+
+# get five minutes load average 
+writeData "loadAverageMinute" "five" "load"
+
+# get several memory metric data
+for type in "cached" "buffers" "dirty" "writeback"; do
+  echo ',' >> "${outfile}"
+  writeData "memory" "${type}"
+done
+
+# get network traffic transmitted metric data
+echo ',' >> "${outfile}"
+writeData "network" "tx"
+# get network traffic received metric data
+echo ',' >> "${outfile}"
+writeData "network" "rx"
 
 # close valid json
 echo '}' >> "${outfile}"
