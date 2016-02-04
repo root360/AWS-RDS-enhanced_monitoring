@@ -1,14 +1,17 @@
-# AWS-RDS-enhanced_monitoring
-Prototype to visualize logged metric data of AWS RDS Enhanced Monitoring
+# AWS RDS Enhanced Monitoring
 
-## Dependencies
+## Plotting
+
+Prototype to plot system metric data collected by AWS RDS Enhanced Monitoring
+
+### Dependencies
 
 * [aws-cli](https://aws.amazon.com/cli/)
 * [bash](https://www.gnu.org/software/bash/)
 * [jshon](http://kmkeen.com/jshon/2011-02-15-13-46-51-602.html)
 * [sed](http://www.gnu.org/software/sed/)
 
-## Usage
+### Usage
 
 * define credentials and profile for aws cli 
 ```
