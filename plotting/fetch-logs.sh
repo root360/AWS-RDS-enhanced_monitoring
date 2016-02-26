@@ -18,7 +18,7 @@ function usage() {
   echo "  -g: name of log group (see aws [--profile <awscli-profile-name>] logs describe-log-groups or AWS Console)"
   echo "  -h: this help"
   echo "  -p: name of aws cli profile"
-  echo "  -s: name of log stream (see aws [--profile <awscli-profile-name>] logs cribe-log-streamsAWS Console)"
+  echo "  -s: name of log stream (see aws [--profile <awscli-profile-name>] --log-group-name <log-group-name> logs decribe-log-streams or AWS Console)"
   echo "    UNIX timestamp format can be generated with:"
   echo "      \"date -d '2016-01-09 15:00:00' +%s000\""
 }
