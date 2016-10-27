@@ -191,5 +191,11 @@ writeData "network" "tx"
 echo ',' >> "${outfile}"
 writeData "network" "rx"
 
+# tasks count (should be similar to connection)
+for type in "total" "sleeping" "running" "zombie" "stopped";do
+  echo ',' >> "${outfile}"
+  writeData "tasks" "${type}"
+done
+
 # close valid json
 echo '}' >> "${outfile}"

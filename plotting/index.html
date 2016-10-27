@@ -137,6 +137,17 @@ $(document).ready(function(){
     plots.push(setup(selector, data, plots));
     // finished network
 
+    // plot tasks
+    selector = "tasks";
+    var data = [
+          {data: json.total.data, label: json.total.label + " (left)"},
+          {data: json.sleeping.data, label: json.sleeping.label + " (left)"},
+          {data: json.running.data, label: json.running.label + " (left)"},
+          {data: json.zombie.data, label: json.zombie.label + " (right)", yaxis: 2},
+          {data: json.stopped.data, label: json.stopped.label + " (right)", yaxis: 2},
+        ];
+    plots.push(setup(selector, data, plots));
+    // finished network
 
     $('#reset').click(function (event, ranges) {
       $.each(plots, function(pl) {
@@ -194,5 +205,6 @@ $(document).ready(function(){
   <div id="cpu" class="plot"></div>
   <div id="memory" class="plot"></div>
   <div id="network" class="plot"></div>
+  <div id="tasks" class="plot"></div>
 </body>
 </html>
