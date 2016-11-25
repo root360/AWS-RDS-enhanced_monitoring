@@ -129,7 +129,7 @@ function startType() {
   local category="${1}"
   local type="${2}"
   echo "generating ${category} -> ${type}"
-  echo '"'"${type}"'": {
+  echo '"'"${category}_${type}"'": {
   "label": "'"${category} ${type}"'",
   "data": [' >> "${outfile}"
 }
@@ -182,6 +182,12 @@ writeData "loadAverageMinute" "five" "load"
 for type in "cached" "buffers" "dirty" "writeback"; do
   echo ',' >> "${outfile}"
   writeData "memory" "${type}"
+done
+
+# get several swap metric data
+for type in "cached" "total" "free"; do
+  echo ',' >> "${outfile}"
+  writeData "swap" "${type}"
 done
 
 # get network traffic transmitted metric data

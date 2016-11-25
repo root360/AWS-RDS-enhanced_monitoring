@@ -79,8 +79,8 @@ $(document).ready(function(){
     // plot diskIO await & util
     selector = "diskIO_await-util";
     var data = [
-          {data: json.await.data, label: json.await.label + " (left)"},
-          {data: json.util.data, label: json.util.label + " (right)", yaxis: 2},
+          {data: json.diskIO_await.data, label: json.diskIO_await.label + " (left)"},
+          {data: json.diskIO_util.data, label: json.diskIO_util.label + " (right)", yaxis: 2},
         ];
     plots.push(setup(selector, data, plots));
     // finished plot diskIO await & util
@@ -88,8 +88,8 @@ $(document).ready(function(){
     // plot diskIO tps & avgQueueLen
     selector = "diskIO_tps-avgQueueLen";
     var data = [
-          {data: json.tps.data, label: json.tps.label + " (left)"},
-          {data: json.avgQueueLen.data, label: json.avgQueueLen.label + " (right)", yaxis: 2},
+          {data: json.diskIO_tps.data, label: json.diskIO_tps.label + " (left)"},
+          {data: json.diskIO_avgQueueLen.data, label: json.diskIO_avgQueueLen.label + " (right)", yaxis: 2},
         ];
     plots.push(setup(selector, data, plots));
     // finished plot diskIO tps & avgQueueLen
@@ -97,10 +97,10 @@ $(document).ready(function(){
     // plot diskIO tps & avgQueueLen
     selector = "diskIO_kbs-ios";
     var data = [
-          {data: json.readKbPS.data, label: json.readKbPS.label + " (left)"},
-          {data: json.writeKbPS.data, label: json.writeKbPS.label + " (left)"},
-          {data: json.readIOsPS.data, label: json.readIOsPS.label + " (right)", yaxis: 2},
-          {data: json.writeIOsPS.data, label: json.writeIOsPS.label + " (right)", yaxis: 2},
+          {data: json.diskIO_readKbPS.data, label: json.diskIO_readKbPS.label + " (left)"},
+          {data: json.diskIO_writeKbPS.data, label: json.diskIO_writeKbPS.label + " (left)"},
+          {data: json.diskIO_readIOsPS.data, label: json.diskIO_readIOsPS.label + " (right)", yaxis: 2},
+          {data: json.diskIO_writeIOsPS.data, label: json.diskIO_writeIOsPS.label + " (right)", yaxis: 2},
         ];
     plots.push(setup(selector, data, plots));
     // finished plot diskIO tps & avgQueueLen
@@ -108,11 +108,11 @@ $(document).ready(function(){
     // plot cpu
     selector = "cpu";
     var data = [
-          {data: json.steal.data, label: json.steal.label},
-          {data: json.wait.data, label: json.wait.label},
-          {data: json.system.data, label: json.system.label},
-          {data: json.irq.data, label: json.irq.label},
-          {data: json.five.data, label: json.five.label},
+          {data: json.CPU_steal.data, label: json.CPU_steal.label},
+          {data: json.CPU_wait.data, label: json.CPU_wait.label},
+          {data: json.CPU_system.data, label: json.CPU_system.label},
+          {data: json.CPU_irq.data, label: json.CPU_irq.label},
+          {data: json.load_five.data, label: json.load_five.label},
         ];
     plots.push(setup(selector, data, plots));
     // finished cpu
@@ -120,19 +120,29 @@ $(document).ready(function(){
     // plot memory
     selector = "memory";
     var data = [
-          {data: json.writeback.data, label: json.writeback.label + " (left)"},
-          {data: json.cached.data, label: json.cached.label + " (right)", yaxis: 2},
-          {data: json.dirty.data, label: json.dirty.label + " (left)"},
-          {data: json.buffers.data, label: json.buffers.label + " (right)", yaxis: 2},
+          {data: json.memory_writeback.data, label: json.memory_writeback.label + " (left)"},
+          {data: json.memory_cached.data, label: json.memory_cached.label + " (right)", yaxis: 2},
+          {data: json.memory_dirty.data, label: json.memory_dirty.label + " (left)"},
+          {data: json.memory_buffers.data, label: json.memory_buffers.label + " (right)", yaxis: 2},
         ];
     plots.push(setup(selector, data, plots));
     // finished memory
 
+    // plot swap
+    selector = "swap";
+    var data = [
+          {data: json.swap_cached.data, label: json.swap_cached.label + " (left)"},
+          {data: json.swap_total.data, label: json.swap_total.label + " (left)"},
+          {data: json.swap_free.data, label: json.swap_free.label + " (left)"},
+        ];
+    plots.push(setup(selector, data, plots));
+    // finished swap
+
     // plot network
     selector = "network";
     var data = [
-          {data: json.tx.data, label: json.tx.label + " (left)"},
-          {data: json.rx.data, label: json.rx.label + " (right)", yaxis: 2},
+          {data: json.network_tx.data, label: json.network_tx.label + " (left)"},
+          {data: json.network_rx.data, label: json.network_rx.label + " (right)", yaxis: 2},
         ];
     plots.push(setup(selector, data, plots));
     // finished network
@@ -140,14 +150,14 @@ $(document).ready(function(){
     // plot tasks
     selector = "tasks";
     var data = [
-          {data: json.total.data, label: json.total.label + " (left)"},
-          {data: json.sleeping.data, label: json.sleeping.label + " (left)"},
-          {data: json.running.data, label: json.running.label + " (left)"},
-          {data: json.zombie.data, label: json.zombie.label + " (right)", yaxis: 2},
-          {data: json.stopped.data, label: json.stopped.label + " (right)", yaxis: 2},
+          {data: json.tasks_total.data, label: json.tasks_total.label + " (left)"},
+          {data: json.tasks_sleeping.data, label: json.tasks_sleeping.label + " (left)"},
+          {data: json.tasks_running.data, label: json.tasks_running.label + " (left)"},
+          {data: json.tasks_zombie.data, label: json.tasks_zombie.label + " (right)", yaxis: 2},
+          {data: json.tasks_stopped.data, label: json.tasks_stopped.label + " (right)", yaxis: 2},
         ];
     plots.push(setup(selector, data, plots));
-    // finished network
+    // finished tasks
 
     $('#reset').click(function (event, ranges) {
       $.each(plots, function(pl) {
@@ -204,6 +214,7 @@ $(document).ready(function(){
   <div id="diskIO_tps-avgQueueLen" class="plot"></div>
   <div id="cpu" class="plot"></div>
   <div id="memory" class="plot"></div>
+  <div id="swap" class="plot"></div>
   <div id="network" class="plot"></div>
   <div id="tasks" class="plot"></div>
 </body>
