@@ -175,6 +175,11 @@ for type in "wait" "irq" "system" "steal"; do
   echo ',' >> "${outfile}"
 done
 
+for type in "nice" "total"; do
+  writeData "cpuUtilization" "${type}" "CPU2"
+  echo ',' >> "${outfile}"
+done
+
 # get five minutes load average 
 writeData "loadAverageMinute" "five" "load"
 

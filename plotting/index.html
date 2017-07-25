@@ -117,6 +117,15 @@ $(document).ready(function(){
     plots.push(setup(selector, data, plots));
     // finished cpu
 
+    // plot cpu2
+    selector = "cpu2";
+    var data = [
+          {data: json.CPU2_nice.data, label: json.CPU2_nice.label},
+          {data: json.CPU2_total.data, label: json.CPU2_total.label},
+        ];
+    plots.push(setup(selector, data, plots));
+    // finished cpu
+
     // plot memory
     selector = "memory";
     var data = [
@@ -213,6 +222,7 @@ $(document).ready(function(){
   <div id="diskIO_kbs-ios" class="plot"></div>
   <div id="diskIO_tps-avgQueueLen" class="plot"></div>
   <div id="cpu" class="plot"></div>
+  <div id="cpu2" class="plot"></div>
   <div id="memory" class="plot"></div>
   <div id="swap" class="plot"></div>
   <div id="network" class="plot"></div>
