@@ -21,8 +21,7 @@
 <body>
 <script language="javascript" type="text/javascript">  
 function setup(selector, data, plots) {
-    var options = {
-          lines: { show: true, steps: false },
+    var options = { lines: { show: true, steps: false },
           points: { show: true },
           xaxes: [ { mode: "time", timeformat: "%Y-%m-%d %H:%M:%S" } ],
           yaxes: [ {  }, { position: "right" } ],
@@ -164,9 +163,19 @@ $(document).ready(function(){
           {data: json.tasks_running.data, label: json.tasks_running.label + " (left)"},
           {data: json.tasks_zombie.data, label: json.tasks_zombie.label + " (right)", yaxis: 2},
           {data: json.tasks_stopped.data, label: json.tasks_stopped.label + " (right)", yaxis: 2},
+          {data: json.tasks_blocked.data, label: json.tasks_blocked.label + " (right)", yaxis: 2},
         ];
     plots.push(setup(selector, data, plots));
     // finished tasks
+
+    // plot fileSys
+    selector = "fileSys";
+    var data = [
+          {data: json.fileSys_total.data, label: json.fileSys_total.label + " (left)"},
+          {data: json.fileSys_used.data, label: json.fileSys_used.label + " (left)"},
+        ];
+    plots.push(setup(selector, data, plots));
+    // finished fileSys
 
     $('#reset').click(function (event, ranges) {
       $.each(plots, function(pl) {
@@ -227,5 +236,6 @@ $(document).ready(function(){
   <div id="swap" class="plot"></div>
   <div id="network" class="plot"></div>
   <div id="tasks" class="plot"></div>
+  <div id="fileSys" class="plot"></div>
 </body>
 </html>

@@ -203,9 +203,15 @@ echo ',' >> "${outfile}"
 writeData "network" "rx"
 
 # tasks count (should be similar to connection)
-for type in "total" "sleeping" "running" "zombie" "stopped";do
+for type in "total" "sleeping" "running" "zombie" "stopped" "blocked"; do
   echo ',' >> "${outfile}"
   writeData "tasks" "${type}"
+done
+
+# disk space
+for type in "total" "used"; do
+  echo ',' >> "${outfile}"
+  writeData "fileSys" "${type}"
 done
 
 # close valid json
