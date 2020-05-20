@@ -97,27 +97,27 @@ echo "  end-time:    ${end}"
 echo -n '[' > "${infile}"
 
 # iterate output until last token (chunk) was given by AWS API
-while [[ ${oldtoken} != ${token} ]]; do
+while [[ "${oldtoken}" != "${token}" ]]; do
   oldtoken="${token}"
   echo "downloading with token ${token}"
-  if [[ ${token} -eq 1 ]]; then
+  if [[ "${token}" == "1" ]]; then
     # download logs without token = first chunk
     output="$(aws --profile "${profile}" logs get-log-events --log-group-name "${groupname}" \
       --log-stream-name "${streamname}" --start-time "${start}" \
       --end-time "${end}" --output text)"
-      [[ ${PIPESTATUS} -ne 0 ]] && exit 2
+    echo "${PIPESTATUS[*]}" | tr ' ' '\n' | grep -v '^0$' && exit 2
   else
     # download logs with token = follow-up chunks
     output="$(aws --profile "${profile}" logs get-log-events --log-group-name "${groupname}" \
       --log-stream-name "${streamname}" --next-token "${token}" --start-time "${start}" \
       --end-time "${end}" --output text)"
-      [[ ${PIPESTATUS} -ne 0 ]] && exit 2
+    echo "${PIPESTATUS[*]}" | tr ' ' '\n' | grep -v '^0$' && exit 2
   fi
   # get token of next chunk
   token="$(head -1 <<<"${output}" | cut -f1)"
 
   # manipulate log entry to be json compatible
-  [[ ${oldtoken} != ${token} ]] && sed 's/.*\s\s*\([0-9][0-9]*\)\s\s*\({.*}\)\s.*/{"timestamp":\1,"data":\2},/g;/^[^{]/d' <<<"${output}" >> "${infile}"
+  [[ "${oldtoken}" != "${token}" ]] && sed 's/.*\s\s*\([0-9][0-9]*\)\s\s*\({.*}\)\s.*/{"timestamp":\1,"data":\2},/g;/^[^{]/d' <<<"${output}" >> "${infile}"
 done
 # remove last comma to be json compatible
 sed -i '$ s/,$//;' "${infile}"
@@ -144,13 +144,14 @@ function writeData() {
   local category="${1}"
   local type="${2}"
   local number=0
+  local data
   startType "${3:-${category}}" "${type}" 
   if [[ $(jshon -F "${infile}" -a -e data -e "${category}") =~ ^\[ ]]; then
     # find data of given category and type
-    local data="$(jshon -F "${infile}" -a -e timestamp -u -p -e data -e "${category}" -e "${number}" -e "${type}" -u)"
+    data="$(jshon -F "${infile}" -a -e timestamp -u -p -e data -e "${category}" -e "${number}" -e "${type}" -u)"
   else
     # find data of given category and type
-    local data="$(jshon -F "${infile}" -a -e timestamp -u -p -e data -e "${category}" -e "${type}" -u)"
+    data="$(jshon -F "${infile}" -a -e timestamp -u -p -e data -e "${category}" -e "${type}" -u)"
   fi
   # remove unnecessary lines and create valid json
   sed '/^[0-9][0-9]*$/ { s/$/,/;N;s/\n//; };s/^/[/g;s/$/],/g' <<<"${data}" | \
