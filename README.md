@@ -1,5 +1,7 @@
 # AWS RDS Enhanced Monitoring
 
+See [our blog](https://www.root360.de/aws-enhanced-monitoring-problemanalyse-bei-aws-rds/) for details.
+
 ## Plotting
 
 Prototype to plot system metric data collected by AWS RDS Enhanced Monitoring
