@@ -1,33 +1,70 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <script language="javascript" type="text/javascript" src="libs/jquery-1.12.0.min.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/source/jquery.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/lib/jquery.mousewheel.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/lib/jquery.event.drag.js"></script>
     <script language="javascript" type="text/javascript" src="libs/strftime-min.js"></script>
-    <script language="javascript" type="text/javascript" src="libs/flot/jquery.flot.min.js"></script>
-    <script language="javascript" type="text/javascript" src="libs/flot/jquery.flot.crosshair.min.js"></script>
-    <script language="javascript" type="text/javascript" src="libs/flot/jquery.flot.navigate.min.js"></script>
-    <script language="javascript" type="text/javascript" src="libs/flot/jquery.flot.selection.min.js"></script>
-    <script language="javascript" type="text/javascript" src="libs/flot/jquery.flot.time.min.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/source/jquery.canvaswrapper.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/source/jquery.colorhelpers.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/source/jquery.flot.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/source/jquery.flot.saturated.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/source/jquery.flot.browser.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/source/jquery.flot.drawSeries.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/source/jquery.flot.uiConstants.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/source/jquery.flot.symbol.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/source/jquery.flot.legend.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/source/jquery.flot.crosshair.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/source/jquery.flot.navigate.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/source/jquery.flot.hover.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/source/jquery.flot.selection.js"></script>
+    <script language="javascript" type="text/javascript" src="libs/flot/source/jquery.flot.time.js"></script>
     <style type="text/css">
-      .plot {
-        height: 300px;
-        width: 40%;
-        position: relative;
-        float: left;
-        margin-right: 40px;
-      }
+        .plot {
+            height: 300px;
+            width: 40%;
+            position: relative;
+            float: left;
+            margin-right: 40px;
+        }
+        .main {
+            top: 50px;
+            margin-top: 50px;
+            height: 100%;
+            width: 100%
+        }
+        .control {
+            overflow: hidden;
+            background-color: white;
+            position: fixed; /* Set the navbar to fixed position */
+            top: 0; /* Position the navbar at the top of the page */
+            width: 100%; /* Full */
+        }
+        /* fix SVG CSS based on https://github.com/flot/flot/issues/1708 */
+        .legendLayer .background {
+              fill: rgba(255, 255, 255, 0.70);
+              stroke: rgba(0, 0, 0, 0.90);
+              stroke-width: 1;
+        }
     </style>
  </head>
 <body>
 <script language="javascript" type="text/javascript">  
 function setup(selector, data, plots) {
-    var options = { lines: { show: true, steps: false },
-          points: { show: true },
-          xaxes: [ { mode: "time", timeformat: "%Y-%m-%d %H:%M:%S" } ],
-          yaxes: [ {  }, { position: "right" } ],
-          grid: { hoverable: true },
-          selection: { mode: "x" },
-          crosshair: { mode: "x" },
+    var options = {
+            series: {
+                lines: { show: true, steps: false },
+                points: { show: true },
+            },
+            legend: {
+                show: true,
+                noColumns: 1,
+            },
+            xaxes: [ { mode: "time", timeBase: "milliseconds", timeformat: "%Y-%m-%d %H:%M:%S" } ],
+            yaxes: [ { }, { position: "right" } ],
+            grid: { hoverable: true },
+            selection: { mode: "x" },
+            crosshair: { mode: "x" },
        };
     plotarea = $("#" + selector);
     plotarea.bind("plotselected", function (event, ranges) {
@@ -48,7 +85,7 @@ function setup(selector, data, plots) {
         var x = item.datapoint[0];
         var y = item.datapoint[1];
         
-	var date_convert = strftime.utc();
+        var date_convert = strftime.utc();
         $("#tooltip").html(item.series.label + "<br />date: " + date_convert('%Y-%m-%d %H:%M:%S', new Date(x)) + "<br />value: " + y)
           .css({top: item.pageY+5, left: item.pageX+5})
           .fadeIn(200);
@@ -59,7 +96,7 @@ function setup(selector, data, plots) {
         plots[pl].setCrosshair(pos);
       });
     });
-    var plot = $.plot(plotarea , data, options);
+    var plot = $.plot(plotarea, data, options);
     return plot;
 }
 $(document).ready(function(){
@@ -183,6 +220,7 @@ $(document).ready(function(){
           var opts = axis.options;
           opts.min = null;
           opts.max = null;
+          opts.autoScale = 'loose';
         });
         plots[pl].setupGrid();
         plots[pl].draw();
@@ -217,25 +255,27 @@ $(document).ready(function(){
     }
     
     addArrow("left", 55, 60, { left: -100 });
-    addArrow("right", 25, 60, { left: 100 });
+    addArrow("right", 25, 60, { left: +100 });
   });
 });
 
 </script>
-  <p class="control">
+  <div class="control">
     <button id="reset">Reset</button>
     <button id="big">Big Graphs</button>
     <button id="small">Small Graphs</button>
-  </p>
-  <div id="diskIO_await-util" class="plot"></div>
-  <div id="diskIO_kbs-ios" class="plot"></div>
-  <div id="diskIO_tps-avgQueueLen" class="plot"></div>
-  <div id="cpu" class="plot"></div>
-  <div id="cpu2" class="plot"></div>
-  <div id="memory" class="plot"></div>
-  <div id="swap" class="plot"></div>
-  <div id="network" class="plot"></div>
-  <div id="tasks" class="plot"></div>
-  <div id="fileSys" class="plot"></div>
+  </div>
+  <div class="main">
+    <div id="diskIO_await-util" class="plot"></div>
+    <div id="diskIO_kbs-ios" class="plot"></div>
+    <div id="diskIO_tps-avgQueueLen" class="plot"></div>
+    <div id="cpu" class="plot"></div>
+    <div id="cpu2" class="plot"></div>
+    <div id="memory" class="plot"></div>
+    <div id="swap" class="plot"></div>
+    <div id="network" class="plot"></div>
+    <div id="tasks" class="plot"></div>
+    <div id="fileSys" class="plot"></div>
+  </div>
 </body>
 </html>
